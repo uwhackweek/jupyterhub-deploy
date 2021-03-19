@@ -13,31 +13,12 @@ on:
 
 jobs:
   helm:
-    name: Helm Test
+    name: Helm
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Setup Helm
-      run: |
-        helm version
-        helm repo add stable https://charts.helm.sh/stable
-        helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
-        helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
-        helm repo update
-
-    - name: Set K8s Context
-      uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG }}
-
-    - name: Sops Binary Installer
-      uses: mdgreenwald/mozilla-sops-action@v1
-      with:
-        version: '3.6.1'
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -48,14 +29,30 @@ jobs:
         role-to-assume: github-actions-role
         role-duration-seconds: 900
 
-    - name: Helm list
+    - name: Setup Helm
       run: |
+        helm version
+        helm repo add stable https://charts.helm.sh/stable
+        helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+        helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
+        helm repo update
         helm list -A
+
+    - name: Sops Binary Installer
+      uses: mdgreenwald/mozilla-sops-action@v1
+      with:
+        version: '3.6.1'
+
+    # NOTE: hardcoded cluster name, should make an env variable and match 'release' and 'namespace'
+    - name: Connect to EKS Cluster
+      run: |
+        aws eks --region us-west-2 update-kubeconfig --name snowex-hackweek
 
     # Only upgrade if we've committed to main branch
     - name: Helm upgrade
       if: github.ref == 'refs/heads/main'
       env:
+        SOPS_KMS_ARN: ${{ secrets.SOPS_KMS_ARN }}
         RELEASE: jhub
         NAMESPACE: jhub
       run: |
