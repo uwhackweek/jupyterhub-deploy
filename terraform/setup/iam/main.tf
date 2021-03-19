@@ -114,6 +114,11 @@ resource "aws_iam_role_policy_attachment" "github-role" {
   policy_arn = aws_iam_policy.github-role.arn
 }
 
+# Attach an AWS-managed policy for doing anything with S3
+resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess" {
+  role = aws_iam_role.github-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
 
 # More advanced: all required EKS permissions (read from sidecar file)
 resource "aws_iam_policy" "github-role-eks" {

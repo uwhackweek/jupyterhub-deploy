@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 0.13.0"
+  required_version = "~> 0.14.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -44,7 +44,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.47.0"
+  version = "2.77.0"
 
   name                 = "${local.cluster_name}-vpc"
   cidr                 = "172.16.0.0/16"
