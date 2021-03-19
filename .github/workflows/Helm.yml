@@ -47,6 +47,11 @@ jobs:
         role-to-assume: github-actions-role
         role-duration-seconds: 900
 
+    - name: Test creds
+      run: |
+        aws sts get-caller-identity
+        aws s3 ls terraform-hackweek-snowex
+
     - name: Helm list
       run: |
         helm list -A

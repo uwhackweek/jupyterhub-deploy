@@ -77,6 +77,7 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
   enable_irsa     = true
   cluster_endpoint_private_access = true
+  write_kubeconfig = false
 
   worker_groups_launch_template = [
     {
