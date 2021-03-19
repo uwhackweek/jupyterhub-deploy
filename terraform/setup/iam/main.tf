@@ -21,8 +21,8 @@ provider "aws" {
   region      = var.region
 }
 
-data "aws_s3_bucket" "dinosar" {
-  bucket = "dinosar"
+data "aws_s3_bucket" "snowex" {
+  bucket = "terraform-hackweek-snowex"
 }
 
 # To add tags
@@ -97,12 +97,12 @@ resource "aws_iam_policy" "github-role" {
   "Statement": [
     {
       "Action": [
-        "s3:Get*"
+        "s3:*"
       ],
       "Effect": "Allow",
       "Resource": [
-        "${data.aws_s3_bucket.dinosar.arn}",
-        "${data.aws_s3_bucket.dinosar.arn}/*"
+        "${data.aws_s3_bucket.snowex.arn}",
+        "${data.aws_s3_bucket.snowex.arn}/*"
       ]
     }
   ]

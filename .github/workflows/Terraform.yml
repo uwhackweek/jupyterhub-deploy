@@ -3,10 +3,12 @@ on:
   pull_request:
     paths:
       - 'terraform/**'
+      - '!terraform/readme.md'
       - '.github/workflows/Terraform.yml'
   push:
     paths:
       - 'terraform/**'
+      - '!terraform/readme.md'
       - '.github/workflows/Terraform.yml'
 
 jobs:

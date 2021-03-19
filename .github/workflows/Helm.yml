@@ -2,11 +2,11 @@ name: Helm
 on:
   pull_request:
     paths:
-      - 'hub/**'
+      - 'hub/**.yaml'
       - '.github/workflows/Helm.yml'
   push:
     paths:
-      - 'hub/**'
+      - 'hub/**.yaml'
       - '.github/workflows/Helm.yml'
 
 jobs:

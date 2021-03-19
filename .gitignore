@@ -1,4 +1,4 @@
-kubeconfig.txt
+*kubeconfig*
 
 # Local .terraform directories
 **/.terraform/*

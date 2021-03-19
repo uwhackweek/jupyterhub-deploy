@@ -26,7 +26,6 @@ provider "kubernetes" {
 }
 
 provider "aws" {
-  profile     = "github-eks"
   region      = var.region
 }
 
@@ -72,7 +71,7 @@ module "vpc" {
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = local.cluster_name
-  cluster_version = "1.18"
+  cluster_version = "1.19"
   version         = "~> 13.0"
   subnets         = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
@@ -96,6 +95,7 @@ module "eks" {
     {
       name                    = "user-spot"
       override_instance_types = ["m5.2xlarge", "m4.2xlarge", "m5a.2xlarge"]
+      root_volume_type        = "gp3"
       spot_instance_pools     = 3
       asg_max_size            = 20
       asg_min_size            = 0

@@ -1,4 +1,12 @@
+# docs https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/autoscaling.md
+cloudProvider: aws
 awsRegion: us-west-2
+
+
+image:
+  repository: k8s.gcr.io/autoscaling/cluster-autoscaler
+  # This should match the version of k8s you're running (1.19)
+  tag: v1.19.1
 
 rbac:
   create: true
