@@ -1,0 +1,45 @@
+name: Helm
+on:
+  pull_request:
+    paths:
+      - 'hub/**'
+  push:
+    paths:
+      - 'hub/**'
+
+jobs:
+  helm:
+    name: Helm Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Helm
+      run: |
+        curl https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz | tar -xzf -
+        sudo mv linux-amd64/helm $HELM_EXECUTABLE
+        helm3 version
+        helm3 repo add stable https://charts.helm.sh/stable
+        helm3 repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+        helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
+        helm3 repo update
+
+    - name: Sops Binary Installer
+      uses: mdgreenwald/mozilla-sops-action@v1
+      with:
+        version: '3.6.1'
+      id: install
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+        role-to-assume: github-actions-role
+
+    - name: Helm list
+      run: |
+        helm list -A
