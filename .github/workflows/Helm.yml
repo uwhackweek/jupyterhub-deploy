@@ -37,7 +37,6 @@ jobs:
       with:
         version: '3.6.1'
 
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -47,11 +46,21 @@ jobs:
         role-to-assume: github-actions-role
         role-duration-seconds: 900
 
-    - name: Test creds
-      run: |
-        aws sts get-caller-identity
-        aws s3 ls terraform-hackweek-snowex
-
     - name: Helm list
       run: |
         helm list -A
+
+    # Only upgrade if we've committed to main branch
+    - name: Helm upgrade
+      if: github.ref == 'refs/heads/main'
+      env:
+        RELEASE: jhub
+        NAMESPACE: jhub
+      run: |
+        helm upgrade --cleanup-on-fail \
+          --install $RELEASE jupyterhub/jupyterhub \
+          --namespace $NAMESPACE \
+          --create-namespace \
+          --version=0.11.1 \
+          --values hub/config.yaml \
+          --values secrets://hub/secrets.yaml
