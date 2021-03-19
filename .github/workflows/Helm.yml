@@ -3,9 +3,11 @@ on:
   pull_request:
     paths:
       - 'hub/**'
+      - '.github/workflows/Helm.yml'
   push:
     paths:
       - 'hub/**'
+      - '.github/workflows/Helm.yml'
 
 jobs:
   helm:
