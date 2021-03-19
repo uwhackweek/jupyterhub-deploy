@@ -29,6 +29,11 @@ jobs:
         role-to-assume: github-actions-role
         role-duration-seconds: 900
 
+    # NOTE: hardcoded cluster name, should make an env variable and match 'release' and 'namespace'
+    - name: Connect to EKS Cluster
+      run: |
+        aws eks --region us-west-2 update-kubeconfig --name snowex-hackweek
+
     - name: Setup Helm
       run: |
         helm version
@@ -42,11 +47,6 @@ jobs:
       uses: mdgreenwald/mozilla-sops-action@v1
       with:
         version: '3.6.1'
-
-    # NOTE: hardcoded cluster name, should make an env variable and match 'release' and 'namespace'
-    - name: Connect to EKS Cluster
-      run: |
-        aws eks --region us-west-2 update-kubeconfig --name snowex-hackweek
 
     # Only upgrade if we've committed to main branch
     - name: Helm upgrade
