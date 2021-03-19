@@ -20,10 +20,6 @@ jobs:
 
     - name: Setup Helm
       run: |
-        which helm
-        helm version
-        curl https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz | tar -xzf -
-        echo $PWD/linux-amd64/helm >> $GITHUB_PATH
         helm version
         helm repo add stable https://charts.helm.sh/stable
         helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
@@ -43,9 +39,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
         role-to-assume: github-actions-role
-        role-duration-seconds: 300
+        role-duration-seconds: 900
 
     - name: Helm list
       run: |
-        helm version
         helm list -A
