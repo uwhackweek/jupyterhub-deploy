@@ -1,5 +1,5 @@
-# Minimal config
 singleuser:
+  serviceAccountName: jovyan
   defaultUrl: "/lab"
   cpu:
     limit: 2
