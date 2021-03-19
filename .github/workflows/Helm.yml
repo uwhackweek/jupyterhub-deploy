@@ -26,11 +26,17 @@ jobs:
         helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
         helm repo update
 
+    - name: Set K8s Context
+      uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
     - name: Sops Binary Installer
       uses: mdgreenwald/mozilla-sops-action@v1
       with:
         version: '3.6.1'
-      id: install
+
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
