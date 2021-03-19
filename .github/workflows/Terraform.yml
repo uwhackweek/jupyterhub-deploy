@@ -6,6 +6,8 @@ on:
       - '!terraform/readme.md'
       - '.github/workflows/Terraform.yml'
   push:
+    branches:
+      - 'main'
     paths:
       - 'terraform/**'
       - '!terraform/readme.md'

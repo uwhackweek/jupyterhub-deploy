@@ -5,6 +5,8 @@ on:
       - 'hub/**.yaml'
       - '.github/workflows/Helm.yml'
   push:
+    branches:
+      - 'main'
     paths:
       - 'hub/**.yaml'
       - '.github/workflows/Helm.yml'
