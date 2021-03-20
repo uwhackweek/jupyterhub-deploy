@@ -1,6 +1,6 @@
 # Deploy jupyterhub !
 
-https://zero-to-jupyterhub.readthedocs.io/en/stable/ 
+https://zero-to-jupyterhub.readthedocs.io/en/stable/
 
 You need [helm](https://helm.sh/docs/intro/install/) to install everything onto the EKS cluster:
 ```
@@ -12,7 +12,7 @@ helm repo update
 
 ## Dealing with senstive information in version control
 
-With terraform and helm configurations it's common to have sensative information or "secrets" that should not be publically viewable. In order to store these configurations in a version control system like GitHub it is therefore critical to use an encryption tool. Helm has a plugin for the sops tool for secrets management that we will use https://github.com/jkroepke/helm-secrets 
+With terraform and helm configurations it's common to have sensative information or "secrets" that should not be publically viewable. In order to store these configurations in a version control system like GitHub it is therefore critical to use an encryption tool. Helm has a plugin for the sops tool for secrets management that we will use https://github.com/jkroepke/helm-secrets
 
 So following this guide we create a file called `secrets.yaml`
 https://zero-to-jupyterhub.readthedocs.io/en/stable/jupyterhub/installation.html
@@ -52,3 +52,8 @@ Note this will install JupyerHub Helm Chart Version 0.11.1 (https://github.com/j
 
 Just edit the .yaml or .tf files, push to github and GitHub Actions will deploy changes. If you are adding to our encrypted secrets.yaml, edit with `sops secrets.yaml``
 
+To associate an iam role the default jupyterhub service account you need to add an annotation to the service account that the first jhub deploy creates (or create a yaml to do this). The role permission are defined in [terraform](../terraform/s3-data-bucket.tf)
+```
+kubectl create sa -n jhub jovyan
+kubectl annotate serviceaccount -n jhub jovyan eks.amazonaws.com/role-arn=arn:aws:iam::XXXXXXX:role/jovyan-serviceaccount
+```

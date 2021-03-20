@@ -1,5 +1,5 @@
 singleuser:
-  #serviceAccountName: jovyan
+  serviceAccountName: jovyan
   defaultUrl: "/lab"
   cpu:
     limit: 2
