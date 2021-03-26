@@ -2,27 +2,15 @@
 # Also create a IAM Role so that other people can do things
 # =======================
 terraform {
-  required_version = "~> 0.14.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-  backend "s3" {
-    bucket         = "terraform-hackweek-snowex"
-    key            = "hackweek-iam-user-config.tfstate"
-    region         = "us-west-2"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 provider "aws" {
   region      = var.region
 }
 
-data "aws_s3_bucket" "snowex" {
-  bucket = "terraform-hackweek-snowex"
+data "aws_s3_bucket" "terraform_state_bucket" {
+  bucket = "terraform-hackweek-${var.hackweek_name}"
 }
 
 # To add tags
@@ -101,8 +89,8 @@ resource "aws_iam_policy" "github-role" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "${data.aws_s3_bucket.snowex.arn}",
-        "${data.aws_s3_bucket.snowex.arn}/*"
+        "${data.aws_s3_bucket.terraform_state_bucket.arn}",
+        "${data.aws_s3_bucket.terraform_state_bucket.arn}/*"
       ]
     }
   ]
