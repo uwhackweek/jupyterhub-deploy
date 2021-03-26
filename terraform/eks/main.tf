@@ -10,7 +10,7 @@ provider "kubernetes" {
 }
 
 provider "aws" {
-  region      = var.region
+  region = var.region
 }
 
 data "aws_caller_identity" "current" {}
@@ -30,9 +30,9 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.77.0"
 
-  name                 = "${var.cluster_name}-vpc"
-  cidr                 = "172.16.0.0/16"
-  azs                  = data.aws_availability_zones.available.names
+  name = "${var.cluster_name}-vpc"
+  cidr = "172.16.0.0/16"
+  azs  = data.aws_availability_zones.available.names
 
   public_subnets       = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
   private_subnets      = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
@@ -53,15 +53,15 @@ module "vpc" {
 }
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = var.cluster_name
-  cluster_version = "1.19"
-  version         = "~> 13.0"
-  subnets         = module.vpc.private_subnets
-  vpc_id          = module.vpc.vpc_id
-  enable_irsa     = true
+  source                          = "terraform-aws-modules/eks/aws"
+  cluster_name                    = var.cluster_name
+  cluster_version                 = "1.19"
+  version                         = "~> 13.0"
+  subnets                         = module.vpc.private_subnets
+  vpc_id                          = module.vpc.vpc_id
+  enable_irsa                     = true
   cluster_endpoint_private_access = true
-  write_kubeconfig = false
+  write_kubeconfig                = false
 
   worker_groups_launch_template = [
     {
@@ -75,7 +75,7 @@ module "eks" {
       subnets                 = [module.vpc.private_subnets[0]]
 
       # Use this to set labels / taints
-      kubelet_extra_args      = "--node-labels=node.kubernetes.io/lifecycle=spot,hub.jupyter.org/node-purpose=core"
+      kubelet_extra_args = "--node-labels=node.kubernetes.io/lifecycle=spot,hub.jupyter.org/node-purpose=core"
     },
     {
       name                    = "user-spot"

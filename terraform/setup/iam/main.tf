@@ -6,7 +6,7 @@ terraform {
 }
 
 provider "aws" {
-  region      = var.region
+  region = var.region
 }
 
 data "aws_s3_bucket" "terraform_state_bucket" {
@@ -50,7 +50,7 @@ resource "aws_iam_user_policy_attachment" "github-actor" {
 }
 
 resource "aws_iam_role" "github-role" {
-  name = "github-actions-role"
+  name               = "github-actions-role"
   assume_role_policy = <<EOF
 {
 	"Version": "2012-10-17",
@@ -78,7 +78,7 @@ EOF
 # Permisions for what the role can do once assumed
 # Simple test: access ti files in a specific S3 bucket
 resource "aws_iam_policy" "github-role" {
-  name = "github-actions-role-s3policy"
+  name   = "github-actions-role-s3policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -98,34 +98,34 @@ resource "aws_iam_policy" "github-role" {
 EOF
 }
 resource "aws_iam_role_policy_attachment" "github-role" {
-  role = aws_iam_role.github-role.name
+  role       = aws_iam_role.github-role.name
   policy_arn = aws_iam_policy.github-role.arn
 }
 
 # Attach an AWS-managed policy for doing anything with S3
 resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess" {
-  role = aws_iam_role.github-role.name
+  role       = aws_iam_role.github-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 # More advanced: all required EKS permissions (read from sidecar file)
 resource "aws_iam_policy" "github-role-eks" {
-  name = "github-actions-role-ekspolicy"
+  name   = "github-actions-role-ekspolicy"
   policy = file("eks-permissions.json")
 }
 
 resource "aws_iam_role_policy_attachment" "github-role-eks" {
-  role = aws_iam_role.github-role.name
+  role       = aws_iam_role.github-role.name
   policy_arn = aws_iam_policy.github-role-eks.arn
 }
 
 
 resource "aws_kms_key" "sops-kms-key" {
-  description         = "KMS Key for SOPS Encryption"
+  description = "KMS Key for SOPS Encryption"
 }
 
 resource "aws_iam_policy" "github-role-sops" {
-  name = "github-actions-role-sops"
+  name   = "github-actions-role-sops"
   policy = <<EOF
 {
 	"Version": "2012-10-17",
@@ -146,6 +146,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "github-role-sops" {
-  role = aws_iam_role.github-role.name
+  role       = aws_iam_role.github-role.name
   policy_arn = aws_iam_policy.github-role-sops.arn
 }

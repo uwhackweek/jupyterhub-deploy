@@ -1,9 +1,9 @@
 variable "region" {
   default = "us-west-2"
-  type = string
+  type    = string
 }
 
 variable "hackweek_name" {
   default = "test"
-  type = string
+  type    = string
 }
