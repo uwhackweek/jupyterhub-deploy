@@ -13,13 +13,13 @@ remote_state {
     dynamodb_table = "terraform-hackweek-${local.common.hackweek_name}-lock"
 
     s3_bucket_tags = {
-      Name  = "Terraform test hackweek state storage"
+      Name  = "Terraform ${local.common.hackweek_name} hackweek state storage"
       Hackweek = local.common.hackweek_name
       Owner = local.common.hackweek_owner
     }
 
     dynamodb_table_tags = {
-      Name  = "Terraform test hackweek lock table"
+      Name  = "Terraform ${local.common.hackweek_name} hackweek lock table"
       Hackweek = local.common.hackweek_name
       Owner = local.common.hackweek_owner
     }

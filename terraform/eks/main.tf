@@ -1,21 +1,5 @@
 terraform {
-  required_version = "~> 0.14.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 1.11"
-    }
-  }
-  backend "s3" {
-    bucket         = "terraform-hackweek-snowex"
-    key            = "hackweek-eks-config.tfstate"
-    region         = "us-west-2"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 provider "kubernetes" {
@@ -46,7 +30,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.77.0"
 
-  name                 = "${local.cluster_name}-vpc"
+  name                 = "${var.cluster_name}-vpc"
   cidr                 = "172.16.0.0/16"
   azs                  = data.aws_availability_zones.available.names
 
@@ -58,19 +42,19 @@ module "vpc" {
   single_nat_gateway   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                    = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"           = "1"
   }
 }
 
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = local.cluster_name
+  cluster_name    = var.cluster_name
   cluster_version = "1.19"
   version         = "~> 13.0"
   subnets         = module.vpc.private_subnets
@@ -125,7 +109,7 @@ module "eks" {
           "value"               = "true"
         },
         {
-          "key"                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+          "key"                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
           "propagate_at_launch" = "false"
           "value"               = "true"
         }
