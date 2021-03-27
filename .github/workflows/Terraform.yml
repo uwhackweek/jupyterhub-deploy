@@ -41,9 +41,13 @@ jobs:
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check
-      continue-on-error: true
+
+    - name: Test Terraform Init
+      id: test-init
+      run: terraform init -backend=false
 
     - name: Terraform Init
+      if: github.ref == 'refs/heads/main'
       id: init
       run: terraform init
 

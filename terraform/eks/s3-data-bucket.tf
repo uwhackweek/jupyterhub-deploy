@@ -16,10 +16,10 @@ resource "aws_s3_bucket" "hackweek-data-bucket" {
 
 # bucket access policy
 resource "aws_iam_policy" "hackweek-bucket-access-policy" {
-    name        = "${var.hackweek_name}-data-bucket-access-policy"
-    path        = "/"
-    description = "Permissions for Terraform-controlled EKS cluster creation and management"
-    policy      = data.aws_iam_policy_document.hackweek-bucket-access-permissions.json
+  name        = "${var.hackweek_name}-data-bucket-access-policy"
+  path        = "/"
+  description = "Permissions for Terraform-controlled EKS cluster creation and management"
+  policy      = data.aws_iam_policy_document.hackweek-bucket-access-permissions.json
 }
 
 # bucket access policy data
@@ -27,11 +27,11 @@ data "aws_iam_policy_document" "hackweek-bucket-access-permissions" {
   version = "2012-10-17"
 
   statement {
-    sid       = "${var.hackweek_name}DataBucketListAccess"
+    sid = "${var.hackweek_name}DataBucketListAccess"
 
-    effect    = "Allow"
+    effect = "Allow"
 
-    actions   = [
+    actions = [
       "s3:ListBucket"
     ]
 
@@ -41,11 +41,11 @@ data "aws_iam_policy_document" "hackweek-bucket-access-permissions" {
   }
 
   statement {
-    sid       = "${var.hackweek_name}DataBucketReadWriteAccess"
+    sid = "${var.hackweek_name}DataBucketReadWriteAccess"
 
-    effect    = "Allow"
+    effect = "Allow"
 
-    actions   = [
+    actions = [
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject"

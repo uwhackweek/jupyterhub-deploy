@@ -1,21 +1,5 @@
 terraform {
-  required_version = "~> 0.14.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 1.11"
-    }
-  }
-  backend "s3" {
-    bucket         = "terraform-hackweek-snowex"
-    key            = "hackweek-eks-config.tfstate"
-    region         = "us-west-2"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 provider "kubernetes" {
@@ -26,7 +10,7 @@ provider "kubernetes" {
 }
 
 provider "aws" {
-  region      = var.region
+  region = var.region
 }
 
 data "aws_caller_identity" "current" {}
@@ -46,9 +30,9 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.77.0"
 
-  name                 = "${local.cluster_name}-vpc"
-  cidr                 = "172.16.0.0/16"
-  azs                  = data.aws_availability_zones.available.names
+  name = "${var.cluster_name}-vpc"
+  cidr = "172.16.0.0/16"
+  azs  = data.aws_availability_zones.available.names
 
   public_subnets       = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
   private_subnets      = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
@@ -58,26 +42,26 @@ module "vpc" {
   single_nat_gateway   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                    = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"           = "1"
   }
 }
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = local.cluster_name
-  cluster_version = "1.19"
-  version         = "~> 13.0"
-  subnets         = module.vpc.private_subnets
-  vpc_id          = module.vpc.vpc_id
-  enable_irsa     = true
+  source                          = "terraform-aws-modules/eks/aws"
+  cluster_name                    = var.cluster_name
+  cluster_version                 = "1.19"
+  version                         = "~> 13.0"
+  subnets                         = module.vpc.private_subnets
+  vpc_id                          = module.vpc.vpc_id
+  enable_irsa                     = true
   cluster_endpoint_private_access = true
-  write_kubeconfig = false
+  write_kubeconfig                = false
 
   worker_groups_launch_template = [
     {
@@ -91,7 +75,7 @@ module "eks" {
       subnets                 = [module.vpc.private_subnets[0]]
 
       # Use this to set labels / taints
-      kubelet_extra_args      = "--node-labels=node.kubernetes.io/lifecycle=spot,hub.jupyter.org/node-purpose=core"
+      kubelet_extra_args = "--node-labels=node.kubernetes.io/lifecycle=spot,hub.jupyter.org/node-purpose=core"
     },
     {
       name                    = "user-spot"
@@ -125,7 +109,7 @@ module "eks" {
           "value"               = "true"
         },
         {
-          "key"                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+          "key"                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
           "propagate_at_launch" = "false"
           "value"               = "true"
         }

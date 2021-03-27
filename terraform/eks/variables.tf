@@ -1,7 +1,14 @@
 variable "region" {
   default = "us-west-2"
+  type    = string
 }
 
 variable "hackweek_name" {
-  default = "snowex"
+  default = "test"
+  type    = string
+}
+
+variable "cluster_name" {
+  default = "test-hackweek"
+  type    = string
 }
