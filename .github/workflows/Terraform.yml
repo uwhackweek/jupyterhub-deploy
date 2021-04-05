@@ -13,18 +13,36 @@ on:
       - '!terraform/readme.md'
       - '.github/workflows/Terraform.yml'
 
-env:
-  tf_version: '0.14.8'
-  tg_version: '0.27.0'
-  tf_working_dir: './terraform'
-
 jobs:
   terragrunt:
     name: 'Terragrunt'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.8
+          channels: conda-forge,defaults
+          channel-priority: true
+          auto-activate-base: true
+          activate-environment: ""
+
+      - name: Print conda env
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+
+      - name: Install terragrunt
+        shell: bash -l {0}
+        run: |
+          conda install --yes terragrunt
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -35,58 +53,29 @@ jobs:
           role-to-assume: github-actions-role
           role-duration-seconds: 900
 
-      - name: 'Terragrunt Format'
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
-          tf_actions_binary: 'terragrunt run-all'
-          tf_actions_subcommand: 'fmt'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Terragrunt Init'
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
-          tf_actions_binary: 'terragrunt run-all'
-          tf_actions_subcommand: 'init'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Terragrunt Validate'
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
-          tf_actions_binary: 'terragrunt run-all'
-          tf_actions_subcommand: 'validate'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Terragrunt Plan'
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
-          tf_actions_binary: 'terragrunt run-all'
-          tf_actions_subcommand: 'plan'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Terragrunt Apply'
+      - name: Terragrunt Format
+        id: fmt
+        shell: bash -l {0}
+        run: terragrunt run-all fmt -check
+
+      - name: Terragrunt Init
+        id: init
+        shell: bash -l {0}
+        run: terragrunt run-all init
+
+      - name: Terragrunt Validate
+        id: validate
+        shell: bash -l {0}
+        run: terragrunt run-all validate -no-color
+
+      - name: Terragrunt Plan
+        id: plan
+        shell: bash -l {0}
+        run: terragrunt run-all plan -no-color
+        continue-on-error: true
+
+      - name: Terragrunt Apply
         if: github.ref == 'refs/heads/main'
         id: apply
-        uses: the-commons-project/terragrunt-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tg_actions_version: ${{ env.tg_version }}
-          tf_actions_binary: 'terragrunt run-all'
-          tf_actions_subcommand: 'apply'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: false
+        shell: bash -l {0}
+        run: terragrunt run-all apply -auto-approve
