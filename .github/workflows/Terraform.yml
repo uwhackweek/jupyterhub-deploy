@@ -80,6 +80,7 @@ jobs:
       - name: 'Terragrunt Apply'
         if: github.ref == 'refs/heads/main'
         id: apply
+        uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_version: ${{ env.tf_version }}
           tg_actions_version: ${{ env.tg_version }}
