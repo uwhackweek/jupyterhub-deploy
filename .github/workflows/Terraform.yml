@@ -12,6 +12,10 @@ on:
       - 'terraform/**'
       - '!terraform/readme.md'
       - '.github/workflows/Terraform.yml'
+      
+env:
+  # https://github.com/gruntwork-io/terragrunt/issues/616#issuecomment-443834779
+  AWS_SDK_LOAD_CONFIG: true
 
 jobs:
   terragrunt:
