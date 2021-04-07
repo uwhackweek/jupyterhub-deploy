@@ -54,12 +54,14 @@ jobs:
           role-to-assume: github-actions-role
           role-duration-seconds: 900
 
+      - name: Terraform Format
+        shell: bash -l {0}
+        working-directory: ./terraform/eks
+        run: terraform fmt -check
+
       - name: Terragrunt Format
         id: fmt
         shell: bash -l {0}
-        env:
-          # https://terragrunt.gruntwork.io/docs/features/work-with-multiple-aws-accounts/
-          TERRAGRUNT_IAM_ROLE: arn:aws:iam::${steps.aws-config.output.aws-account-id}:role/github-actions-role
         run: terragrunt run-all fmt -check
 
       - name: Terragrunt Init
